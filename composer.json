@@ -1,0 +1,14 @@
+{
+    "name": "murat11/phanviz",
+    "description": "PHP Client for Anviz T&A devices",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Murat Erkenov",
+            "email": "murat@11bits.net"
+        }
+    ],
+    "require": {
+        "php": "^7.2"
+    }
+}
