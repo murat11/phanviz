@@ -3,6 +3,7 @@
 namespace PhAnviz;
 
 use Generator;
+use PhAnviz\Transport\SocketTransport;
 use PhAnviz\Transport\TransportInterface;
 
 class Client
@@ -16,6 +17,18 @@ class Client
      * @var TransportInterface
      */
     private $transport;
+
+    /**
+     * @param string $deviceId
+     * @param string $address
+     * @param int $port
+     *
+     * @return Client
+     */
+    public static function createInstance(string $deviceId, string $address, int $port): self
+    {
+        return new static($deviceId, new SocketTransport($address, $port));
+    }
 
     /**
      * Client constructor.
