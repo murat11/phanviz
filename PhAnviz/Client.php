@@ -110,10 +110,10 @@ class Client
 
         $result = [
             'stx' => implode(array_slice($resArr, 0, 1)),
-            'ch'  => implode(array_slice($resArr, 1, 4)),
-            'ack' => implode(array_slice($resArr, 5, 1)),
+            'ch'  => hexdec(implode(array_slice($resArr, 1, 4))),
+            'ack' => hexdec(implode(array_slice($resArr, 5, 1))),
             'ret' => implode(array_slice($resArr, 6, 1)),
-            'len' => implode(array_slice($resArr, 7, 2)),
+            'len' => hexdec(implode(array_slice($resArr, 7, 2))),
             'crc' => implode(array_slice($resArr, -2, 2)),
         ];
         $result['data'] = array_slice($resArr, 9, $result['len']);
