@@ -2,7 +2,7 @@
 
 namespace PhAnviz;
 
-use Generator;
+use PhAnviz\Client\ResponseParser;
 use PhAnviz\Transport\SocketTransport;
 use PhAnviz\Transport\TransportInterface;
 
@@ -19,6 +19,11 @@ class Client
     private $transport;
 
     /**
+     * @var ResponseParser
+     */
+    private $responseParser;
+
+    /**
      * @param string $deviceId
      * @param string $address
      * @param int $port
@@ -27,7 +32,7 @@ class Client
      */
     public static function createInstance(string $deviceId, string $address, int $port): self
     {
-        return new static($deviceId, new SocketTransport($address, $port));
+        return new static($deviceId, new SocketTransport($address, $port), new ResponseParser());
     }
 
     /**
@@ -35,38 +40,28 @@ class Client
      *
      * @param string $deviceId
      * @param TransportInterface $transport
+     * @param ResponseParser $responseParser
      */
-    public function __construct(string $deviceId, TransportInterface $transport)
+    public function __construct(string $deviceId, TransportInterface $transport, ResponseParser $responseParser)
     {
         $this->deviceId = $deviceId;
         $this->transport = $transport;
+        $this->responseParser = $responseParser;
     }
 
     /**
      * @param int    $command
      * @param string $data
      *
-     * @return \Generator
+     * @return array
      */
     public function request(int $command, string $data = null)
     {
         $req = $this->createRequestString($command, $data);
         $response = $this->transport->req($req);
-        foreach (explode(PHP_EOL, $response) as $responseItem) {
-            yield self::parseResponse($responseItem);
-        }
-    }
+        $result = $this->responseParser->parse($response);
 
-    /**
-     * @param array $commands
-     *
-     * @return Generator
-     */
-    public function requestMulti(array $commands)
-    {
-        foreach ($commands as list($command, $data)) {
-            yield $this->request($command, $data);
-        }
+        return $result;
     }
 
     /**
@@ -88,36 +83,5 @@ class Client
         $req = hex2bin($req);
 
         return $req;
-    }
-
-    /**
-     * Convert response from:
-     *
-     * STX      CH(device code)     ACK(response)               RET(return)     LEN(data length)    DATA            CRC16
-     * 0xA5     4 Bytes             1 Byte(command + 0x80)      1 Byte          2 Bytes             0-400 Bytes     2 Bytes
-     *
-     * to array
-     *
-     * @param string $response
-     *
-     * @return array
-     */
-    private static function parseResponse($response)
-    {
-        $response = implode(unpack("H*", $response));
-
-        $resArr = str_split($response, 2);
-
-        $result = [
-            'stx' => implode(array_slice($resArr, 0, 1)),
-            'ch'  => hexdec(implode(array_slice($resArr, 1, 4))),
-            'ack' => hexdec(implode(array_slice($resArr, 5, 1))),
-            'ret' => implode(array_slice($resArr, 6, 1)),
-            'len' => hexdec(implode(array_slice($resArr, 7, 2))),
-            'crc' => implode(array_slice($resArr, -2, 2)),
-        ];
-        $result['data'] = array_slice($resArr, 9, $result['len']);
-
-        return $result;
     }
 }
