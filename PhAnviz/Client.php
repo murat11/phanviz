@@ -2,8 +2,9 @@
 
 namespace PhAnviz;
 
+use PhAnviz\Client\LoggerInterface;
 use PhAnviz\Client\ResponseParser;
-use PhAnviz\Client\Transport\SocketTransport;
+use PhAnviz\Client\Transports\SocketTransport;
 use PhAnviz\Client\TransportInterface;
 
 class Client
@@ -22,6 +23,11 @@ class Client
      * @var ResponseParser
      */
     private $responseParser;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param string $deviceId
@@ -58,10 +64,37 @@ class Client
     public function request(int $command, string $data = null)
     {
         $req = $this->createRequestString($command, $data);
+        if ($this->logger) {
+            $this->logger->log(
+                sprintf(
+                    "\n%s - New Command [%04x %s] - %s\n",
+                    date('r'),
+                    $command,
+                    $data,
+                    implode(unpack("H*", $req))
+                )
+            );
+        }
         $response = $this->transport->req($req);
         $result = $this->responseParser->parse($response);
+        if ($this->logger) {
+            $this->logger->log(
+                sprintf("Response %s, parsed: %s \n\n",
+                    implode(unpack("H*", $response)),
+                    json_encode($result)
+                )
+            );
+        }
 
         return $result;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     /**

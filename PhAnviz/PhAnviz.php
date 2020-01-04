@@ -5,7 +5,7 @@ namespace PhAnviz;
 use DateTime;
 use DateTimeZone;
 use PhAnviz\Client\ResponseParser;
-use PhAnviz\Client\Transport\SocketTransport;
+use PhAnviz\Client\Transports\SocketTransport;
 
 class PhAnviz
 {
@@ -112,7 +112,7 @@ class PhAnviz
                     'record_type' => hexdec($res['data'][$itemOffset + 10] & 0xF),
                     'work_type' => hexdec(implode(array_slice($res['data'], $itemOffset + 11, 2))),
                 ];
-                $result['ta_records'][md5(print_r($record, true))] = $record;
+                $result['ta_records'][md5(json_encode($record))] = $record;
             }
         };
 
