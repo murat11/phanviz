@@ -42,14 +42,10 @@ class SocketTransport implements TransportInterface
     {
         $this->connect();
         fwrite($this->socket, $request);
-
-        $responses = [];
-        while ($str = fgets($this->socket, 1024)) {
-            $responses[] = $str;
-        }
+        $response = fread($this->socket, 1024 * 16);
         fclose($this->socket);
 
-        return implode(PHP_EOL, $responses);
+        return $response;
     }
 
 
