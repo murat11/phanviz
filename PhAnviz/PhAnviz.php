@@ -5,7 +5,7 @@ namespace PhAnviz;
 use DateTime;
 use DateTimeZone;
 use PhAnviz\Client\ResponseParser;
-use PhAnviz\Transport\SocketTransport;
+use PhAnviz\Client\Transport\SocketTransport;
 
 class PhAnviz
 {
@@ -19,7 +19,8 @@ class PhAnviz
      * Operation successful
      */
     private const ACK_SUCCESS = 0x00;
-    const ANVIZ_EPOCH = 946771200;
+
+    private const ANVIZ_EPOCH = 946771200;
 
     /**
      * @var Client
@@ -60,6 +61,13 @@ class PhAnviz
         }
     }
 
+    /**
+     * @param int $command
+     * @param string|null $data
+     * @param array $responseHandlers
+     *
+     * @return array
+     */
     public function runCommand(int $command, ?string $data, array $responseHandlers): array
     {
         $response = $this->client->request($command, $data);
@@ -75,6 +83,11 @@ class PhAnviz
         return $result;
     }
 
+    /**
+     * @param bool $clear
+     *
+     * @return array
+     */
     public function downloadNewTimeAttendanceRecords(bool $clear = false): array
     {
         $timeAttendanceRecordsHandler = function ($res, &$result) {

@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhAnviz\Transport;
+namespace PhAnviz\Client\Transports;
 
+use PhAnviz\Client\TransportInterface;
 use RuntimeException;
 
 class SocketTransport implements TransportInterface

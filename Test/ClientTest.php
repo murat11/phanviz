@@ -2,7 +2,7 @@
 
 use PhAnviz\Client;
 use PhAnviz\Client\ResponseParser;
-use PhAnviz\Transport\TransportInterface;
+use PhAnviz\Client\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase

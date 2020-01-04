@@ -3,8 +3,8 @@
 namespace PhAnviz;
 
 use PhAnviz\Client\ResponseParser;
-use PhAnviz\Transport\SocketTransport;
-use PhAnviz\Transport\TransportInterface;
+use PhAnviz\Client\Transport\SocketTransport;
+use PhAnviz\Client\TransportInterface;
 
 class Client
 {
