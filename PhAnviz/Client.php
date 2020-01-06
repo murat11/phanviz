@@ -67,8 +67,7 @@ class Client
         if ($this->logger) {
             $this->logger->log(
                 sprintf(
-                    "\n%s - New Command [%04x %s] - %s\n",
-                    date('r'),
+                    "Command: %02x %s (%s),",
                     $command,
                     $data,
                     implode(unpack("H*", $req))
@@ -79,7 +78,7 @@ class Client
         $result = $this->responseParser->parse($response);
         if ($this->logger) {
             $this->logger->log(
-                sprintf("Response %s, parsed: %s \n\n",
+                sprintf(" response: %s (parsed: %s)\n",
                     implode(unpack("H*", $response)),
                     json_encode($result)
                 )
