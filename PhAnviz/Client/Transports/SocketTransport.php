@@ -43,7 +43,13 @@ class SocketTransport implements TransportInterface
     {
         $this->connect();
         fwrite($this->socket, $request);
-        $response = fread($this->socket, 1024 * 16);
+        $response = '';
+        stream_set_timeout($this->socket, 3);
+        $info = stream_get_meta_data($this->socket);
+        while (!feof($this->socket) && !($info['timed_out'] ?? true)) {
+            $response .= fgets($this->socket);
+            $info = stream_get_meta_data($this->socket);
+        }
         fclose($this->socket);
 
         return $response;
@@ -58,7 +64,6 @@ class SocketTransport implements TransportInterface
             $errno,
             $errorMessage
         );
-
         if (!$this->socket) {
             throw new RuntimeException(
                 sprintf('Can not connect to %s:%d', $this->address, $this->port),
